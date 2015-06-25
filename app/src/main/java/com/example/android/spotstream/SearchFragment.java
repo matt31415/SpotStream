@@ -7,8 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -73,6 +76,8 @@ public class SearchFragment extends Fragment {
      * although I didn't like that authors use of theView tag to store random data.
      */
     public class ArtistArrayAdapter extends ArrayAdapter<ArtistInfo> {
+        private final String LOG_TAG = ArtistArrayAdapter.class.getSimpleName();
+
         private Context mContext;
         private int mLayoutResource;
         private ArrayList<ArtistInfo> mArtistInfoData;
@@ -101,8 +106,16 @@ public class SearchFragment extends Fragment {
 
             ArtistInfo artistInfo = mArtistInfoData.get(position);
 
-            TextView urlText = (TextView)convertView.findViewById(R.id.list_item_artist_image);
-            urlText.setText(artistInfo.mImageURL);
+            //TextView urlText = (TextView)convertView.findViewById(R.id.list_item_artist_image);
+            //urlText.setText(artistInfo.mImageURL);
+
+            ImageView artistImageView = (ImageView)convertView.findViewById(R.id.list_item_artist_image);
+            Picasso.with(mContext)
+                    .load(mArtistInfoData.get(position).mImageURL)
+                    .resize(200,200)
+                    .centerCrop()
+                    .into(artistImageView);
+
             TextView nameText = (TextView)convertView.findViewById(R.id.list_item_artist_name);
             nameText.setText(artistInfo.mName);
 
