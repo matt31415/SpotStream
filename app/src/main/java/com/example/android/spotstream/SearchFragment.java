@@ -106,13 +106,11 @@ public class SearchFragment extends Fragment {
 
             ArtistInfo artistInfo = mArtistInfoData.get(position);
 
-            //TextView urlText = (TextView)convertView.findViewById(R.id.list_item_artist_image);
-            //urlText.setText(artistInfo.mImageURL);
-
+            //TODO: Figure out layout and sizing of images
             ImageView artistImageView = (ImageView)convertView.findViewById(R.id.list_item_artist_image);
             Picasso.with(mContext)
                     .load(mArtistInfoData.get(position).mImageURL)
-                    .resize(200,200)
+                    .fit()
                     .centerCrop()
                     .into(artistImageView);
 
