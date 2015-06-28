@@ -8,13 +8,13 @@
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:id="@+id/list_item_artist_image"
-        android:src="@mipmap/profile" />
+        android:id="@+id/list_item_song_image"
+        android:src="@mipmap/note" />
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="100dp"
-        android:id="@+id/list_item_artist_name"
+        android:id="@+id/list_item_song_name"
         android:gravity="left|center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeight"
         android:layout_weight="1"

@@ -32,7 +32,6 @@ public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
     private int mTextResource;
     private int mImageResource;
 
-
     /**
      * Basic cosnstructor to override Array Adapeter.
      *
@@ -64,7 +63,7 @@ public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
      * @param position Index of the data element we want to render
      * @param convertView The view for the list element (might be null if it hasn't been created yet
      * @param parent The parent ViewGroup
-     * @return
+     * @return The rendered View object
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -77,15 +76,19 @@ public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
 
         ImageView artistImageView = (ImageView) convertView.findViewById(mImageResource);
 
-        if (artistInfo.mImageURL != null) {
+        if (artistInfo.mImageUrl != null) {
             Picasso.with(mContext)
-                    .load(mArtistData.get(position).mImageURL)
+                    .load(artistInfo.mImageUrl)
                     .fit()
                     .centerCrop()
                     .into(artistImageView);
         }
         else {
-            artistImageView.setImageResource(R.mipmap.profile);
+            Picasso.with(mContext)
+                    .load(R.mipmap.profile)
+                    .fit()
+                    .centerCrop()
+                    .into(artistImageView);
         }
 
         TextView nameText = (TextView)convertView.findViewById(mTextResource);

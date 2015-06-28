@@ -6,12 +6,12 @@ package com.example.android.spotstream;
  */
 public class Artist {
     public String mName;
-    public String mImageURL;
+    public String mImageUrl;
     public String mSpotifyId;
 
     Artist(String name, String imageURL, String spotifyId) {
         mName = name;
-        mImageURL = imageURL;
+        mImageUrl = imageURL;
         mSpotifyId = spotifyId;
     }
 }
