@@ -13,9 +13,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- * The TextPlusImageArrayAdapter is used when working with pairs of images and strings.  In this case
+ * The ArtistArrayAdapter is used when working with pairs of images and strings.  In this case
  * the image will be represented by URLs pointing to image resources.   The adapter works with
- * ArrayLists of TextPlusImage objects (a really simple object containing a string and a URL  that
+ * ArrayLists of Artist objects (a really simple object containing a string and a URL  that
  * points to an image).
  *
  * This was inspired by:
@@ -23,12 +23,12 @@ import java.util.ArrayList;
  * although I didn't like that authors use of theView tag to store random data, so I'm risking a
  * bit of a performance hit instead..
  */
-public class TextPlusImageArrayAdapter extends ArrayAdapter<TextPlusImage> {
-    private final String LOG_TAG = TextPlusImageArrayAdapter.class.getSimpleName();
+public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
+    private final String LOG_TAG = ArtistArrayAdapter.class.getSimpleName();
 
     private Context mContext;
     private int mLayoutResource;
-    private ArrayList<TextPlusImage> mTextPlusImageData;
+    private ArrayList<Artist> mArtistData;
     private int mTextResource;
     private int mImageResource;
 
@@ -38,14 +38,14 @@ public class TextPlusImageArrayAdapter extends ArrayAdapter<TextPlusImage> {
      *
      * @param context
      * @param resource The resource id for the layout containing a single item from the list
-     * @param objects The list of TextPlusImage objects that we wish to add to the adapter.
+     * @param objects The list of Artist objects that we wish to add to the adapter.
      * @param textResource The resource id for the field into which we want to place the text
      * @param imageResource The resource id for the field into which we want to place the image
      */
-    public TextPlusImageArrayAdapter(
+    public ArtistArrayAdapter(
             Context context,
             int resource,
-            ArrayList<TextPlusImage> objects,
+            ArrayList<Artist> objects,
             int textResource,
             int imageResource
     ) {
@@ -53,7 +53,7 @@ public class TextPlusImageArrayAdapter extends ArrayAdapter<TextPlusImage> {
 
         mContext = context;
         mLayoutResource = resource;
-        mTextPlusImageData = objects;
+        mArtistData = objects;
         mTextResource = textResource;
         mImageResource = imageResource;
     }
@@ -73,17 +73,23 @@ public class TextPlusImageArrayAdapter extends ArrayAdapter<TextPlusImage> {
             convertView = inflater.inflate(mLayoutResource, parent, false);
         }
 
-        TextPlusImage artistInfo = mTextPlusImageData.get(position);
+        Artist artistInfo = mArtistData.get(position);
 
-        ImageView artistImageView = (ImageView)convertView.findViewById(mImageResource);
-        Picasso.with(mContext)
-                .load(mTextPlusImageData.get(position).mImageURL)
-                .fit()
-                .centerCrop()
-                .into(artistImageView);
+        ImageView artistImageView = (ImageView) convertView.findViewById(mImageResource);
+
+        if (artistInfo.mImageURL != null) {
+            Picasso.with(mContext)
+                    .load(mArtistData.get(position).mImageURL)
+                    .fit()
+                    .centerCrop()
+                    .into(artistImageView);
+        }
+        else {
+            artistImageView.setImageResource(R.mipmap.profile);
+        }
 
         TextView nameText = (TextView)convertView.findViewById(mTextResource);
-        nameText.setText(artistInfo.mText);
+        nameText.setText(artistInfo.mName);
 
         return convertView;
     }
