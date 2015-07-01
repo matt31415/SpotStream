@@ -64,6 +64,7 @@ public class SongsActivityFragment extends Fragment {
 
             SpotifyService spotify = api.getService();
 
+            // TODO: Make "county" a setting in the preferneces menu
             String country = "us";
             Map options = new HashMap<String, String>();
             options.put("country", country);

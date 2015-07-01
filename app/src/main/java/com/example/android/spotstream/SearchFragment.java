@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +29,6 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 public class SearchFragment extends Fragment {
     private final String LOG_TAG = SearchFragment.class.getSimpleName();
 
-
     ArtistArrayAdapter mArtistAdapter;
 
     public SearchFragment() {
@@ -41,7 +39,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_fragment, container, false);
 
-        //TODO: Is there a way to make it so that when we come back from the song listings, the search results are still there?
+         //TODO: Can we add an "X" to make it easy to clear the contents of the search EditText?
 
         //Set up the list of artists
         mArtistAdapter = new ArtistArrayAdapter(
@@ -73,8 +71,6 @@ public class SearchFragment extends Fragment {
                         boolean handled = false;
 
                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                            Log.d(LOG_TAG, "Searching: " + v.getText().toString());
-
                             new FetchArtistsTask().execute(v.getText().toString());
 
                             // The EditText was really inconsistent about closing the keyboard,
@@ -92,6 +88,24 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
+    /**
+     * By overriding the onStart method, we can check to see if there's any text in the search field
+     * and use it to re-run the search.  (This is perhaps a bit wasteful, since we could just store
+     * the state of the list view, but I don't think it's a major issue, since this app is going to
+     * be used heavily for searching, so if the network connection is slow the app will be annoying
+     * all the time, not just when orientation changes.)
+     */
+    @Override
+    public void onStart() {
+        EditText searchEdit = ((EditText) getView().findViewById(R.id.edit_text_artist_search));
+        String searchString = searchEdit.getText().toString();
+
+        if(searchString.length() > 0) {
+            new FetchArtistsTask().execute(searchString);
+        }
+
+        super.onStart();
+    }
 
     public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
         private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
@@ -122,6 +136,11 @@ public class SearchFragment extends Fragment {
             return (Artist[]) artists.toArray(new Artist[artists.size()]);
         }
 
+        /**
+         * After the task has completed, we'll want to update the artis adapter with the new search results.
+         * @param artists
+         */
+        //TODO: Handle the case where no results are returned
         @Override
         protected void onPostExecute( Artist[] artists) {
             ListView artistsListView = (ListView)getActivity().findViewById(R.id.list_view_artists);
