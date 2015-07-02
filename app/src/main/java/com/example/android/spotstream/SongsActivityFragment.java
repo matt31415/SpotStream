@@ -68,7 +68,7 @@ public class SongsActivityFragment extends Fragment {
 
             // TODO: Make "county" a setting in the preferneces menu
             String country = "us";
-            Map<String,String> options = new HashMap<String, String>();
+            Map<String,Object> options = new HashMap<String, Object>();
             options.put("country", country);
 
             Tracks tracks = spotify.getArtistTopTrack(artistSpotifyIds[0], options);
@@ -88,8 +88,7 @@ public class SongsActivityFragment extends Fragment {
                 songs.add(new Song(songTitle + "\n" + songAlbumName, songImageUrl));
 
             }
-            return new Song[0];
-            //return (Song[]) songs.toArray(new Song[songs.size()]);
+            return (Song[]) songs.toArray(new Song[songs.size()]);
         }
 
         @Override
