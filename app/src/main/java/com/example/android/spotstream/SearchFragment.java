@@ -1,5 +1,6 @@
 package com.example.android.spotstream;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -183,18 +186,34 @@ public class SearchFragment extends Fragment {
         }
 
         /**
-         * After the task has completed, we'll want to update the artis adapter with the new search results.
-         * @param artists
+         * After the task has completed, we'll want to update the artist adapter with the new search results.
+         * @param artists - List of artists returned
          */
         //TODO: Handle the case where no results are returned
         @Override
         protected void onPostExecute( Artist[] artists) {
-            ListView artistsListView = (ListView)getActivity().findViewById(R.id.list_view_artists);
+            Activity activity = getActivity();
 
-            //Clear the list adapter, jump to the top, and then add the newly found artists
+            ListView artistsListView = (ListView)activity.findViewById(R.id.list_view_artists);
+
+            // Clear the list adapter, jump to the top, and then add the newly found artists
             mArtistAdapter.clear();
             artistsListView.smoothScrollToPosition(0);
             mArtistAdapter.addAll(artists);
+
+            // If no artists were found, display a toast
+            if (artists.length == 0) {
+                //Find the bottom of the search box
+                int searchEditCoords[] = new int[2];
+                EditText searchEdit = ((EditText) activity.findViewById(R.id.edit_text_artist_search));
+                searchEdit.getLocationOnScreen(searchEditCoords);
+
+                int toastOffset = searchEditCoords[1] + searchEdit.getMeasuredHeight()/2;//+R.dimen.edit_text_artist_search_height/2;
+
+                Toast noArtistToast = Toast.makeText(activity, activity.getString(R.string.no_artists_found_toast), Toast.LENGTH_SHORT) ;
+                noArtistToast.setGravity(Gravity.TOP,0,toastOffset);
+                noArtistToast.show();
+            }
         }
     }
 }

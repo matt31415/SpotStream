@@ -1,5 +1,6 @@
 package com.example.android.spotstream;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +68,7 @@ public class SongsActivityFragment extends Fragment {
 
             // TODO: Make "county" a setting in the preferneces menu
             String country = "us";
-            Map options = new HashMap<String, String>();
+            Map<String,String> options = new HashMap<String, String>();
             options.put("country", country);
 
             Tracks tracks = spotify.getArtistTopTrack(artistSpotifyIds[0], options);
@@ -86,16 +88,26 @@ public class SongsActivityFragment extends Fragment {
                 songs.add(new Song(songTitle + "\n" + songAlbumName, songImageUrl));
 
             }
-            return (Song[]) songs.toArray(new Song[songs.size()]);
+            return new Song[0];
+            //return (Song[]) songs.toArray(new Song[songs.size()]);
         }
 
         @Override
         protected void onPostExecute( Song[] songs) {
-            ListView songListView = (ListView)getActivity().findViewById(R.id.list_view_songs);
+            Activity activity = getActivity();
+
+            ListView songListView = (ListView)activity.findViewById(R.id.list_view_songs);
 
             //Clear the list adapter, and then add the newly found artists
             mSongArrayAdapter.clear();
             mSongArrayAdapter.addAll(songs);
+
+            // If no artists were found, display a toast
+            if (songs.length == 0) {
+                Toast noSongsToast = Toast.makeText(activity, activity.getString(R.string.no_songs_found_toast), Toast.LENGTH_SHORT) ;
+                noSongsToast.show();
+            }
+
         }
     }
 

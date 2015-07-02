@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * to views.  This is very similar to the ArtistArrayAdapter which is also used in
  * this project.
  */
-public class SongArrayAdapter extends ArrayAdapter{
+public class SongArrayAdapter extends ArrayAdapter<Song>{
     private final String LOG_TAG = ArtistArrayAdapter.class.getSimpleName();
 
     private Context mContext;
