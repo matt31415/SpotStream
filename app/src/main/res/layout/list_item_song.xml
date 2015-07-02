@@ -9,7 +9,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:id="@+id/list_item_song_image"
-        android:src="@mipmap/note" />
+        android:src="@drawable/note" />
 
     <TextView
         android:layout_width="fill_parent"

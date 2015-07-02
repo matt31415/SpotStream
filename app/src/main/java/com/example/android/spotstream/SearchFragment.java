@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -39,7 +42,50 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_fragment, container, false);
 
-         //TODO: Can we add an "X" to make it easy to clear the contents of the search EditText?
+        // Make the X on the search edit text clear out the search string.  The X is in the
+        // drawable right position
+        // This code was heavily inspired by:
+        //   http://stackoverflow.com/questions/3554377/handling-click-events-on-a-drawable-within-an-edittext
+        final EditText searchEdit = ((EditText) view.findViewById(R.id.edit_text_artist_search));
+        searchEdit.setOnTouchListener(new View.OnTouchListener() {
+            final int DRAWABLE_RIGHT = 2;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // This logic relies on the fact that the we already know that the click event is
+                // taking place inside the EditText, so bounds-checking is super-easy
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    float rawX = event.getRawX();
+                    float editRightEdge = searchEdit.getRight();
+                    float drawableWidth = searchEdit.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width();
+
+                    if(rawX > editRightEdge - drawableWidth) {
+                        searchEdit.setText("");
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
+        // Add and remove the "clear" X to the edit text
+        searchEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().length() > 0) {
+                    searchEdit.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ic_clear_black_18dp,0);
+                }
+                else {
+                    searchEdit.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0);
+                }
+            }
+        });
 
         //Set up the list of artists
         mArtistAdapter = new ArtistArrayAdapter(

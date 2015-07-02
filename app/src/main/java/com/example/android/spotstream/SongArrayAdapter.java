@@ -83,7 +83,7 @@ public class SongArrayAdapter extends ArrayAdapter{
         }
         else {
             Picasso.with(mContext)
-                    .load(R.mipmap.note)
+                    .load(R.drawable.note)
                     .fit()
                     .centerCrop()
                     .into(songImageView);

@@ -85,7 +85,7 @@ public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
         }
         else {
             Picasso.with(mContext)
-                    .load(R.mipmap.profile)
+                    .load(R.drawable.profile)
                     .fit()
                     .centerCrop()
                     .into(artistImageView);

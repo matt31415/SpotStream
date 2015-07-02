@@ -11,11 +11,8 @@
 
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/edit_text_artist_search"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:maxLines="1"
             android:inputType="textCapWords"
             android:imeOptions="actionSearch"/>

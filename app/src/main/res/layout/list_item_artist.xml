@@ -9,7 +9,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:id="@+id/list_item_artist_image"
-        android:src="@mipmap/profile" />
+        android:src="@drawable/profile" />
 
     <TextView
         android:layout_width="fill_parent"
