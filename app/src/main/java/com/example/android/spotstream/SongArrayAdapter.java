@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by mgay on 6/28/2015.
  *
- * This Song Array adapte takes a list of of Song objects, and converts them
+ * This Song Array Adapter takes a list of of Song objects, and converts them
  * to views.  This is very similar to the ArtistArrayAdapter which is also used in
  * this project.
  */
@@ -32,12 +32,13 @@ public class SongArrayAdapter extends ArrayAdapter<Song>{
     /**
      * A basic constructor.
      *
-     * @param context
-     * @param resource - The layout resource that we'll be using
-     * @param objects - The list of songs
-     * @param titleTextResource - The layout id of the song title
-     * @param imageResource - The layout id of the song image
+     * @param context The context
+     * @param resource The layout resource that we'll be using
+     * @param objects The list of songs
+     * @param titleTextResource The layout id of the song title
+     * @param imageResource The layout id of the song image
      */
+    @SuppressWarnings("SameParameterValue")
     public SongArrayAdapter (
             Context context,
             int resource,
@@ -57,7 +58,7 @@ public class SongArrayAdapter extends ArrayAdapter<Song>{
     /**
      * Overrides the getView function from ArrayAdapter.  Generates and returns a View of the data
      * at the passed in position.  We'll be populating the image resource with the Song's imageUrl,
-     * and the titleTextReosurce with the song's title and album name.
+     * and the titleTextResource with the song's title and album name.
      *
      * @param position index of the data item to render
      * @param convertView The view for the list element (might be null if it hasn't been created yet

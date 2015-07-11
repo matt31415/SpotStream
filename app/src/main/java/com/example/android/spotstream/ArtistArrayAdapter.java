@@ -33,14 +33,15 @@ public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
     private int mImageResource;
 
     /**
-     * Basic cosnstructor to override Array Adapeter.
+     * Basic constructor to override Array Adapter.
      *
-     * @param context
+     * @param context The context
      * @param resource The resource id for the layout containing a single item from the list
      * @param objects The list of Artist objects that we wish to add to the adapter.
      * @param textResource The resource id for the field into which we want to place the text
      * @param imageResource The resource id for the field into which we want to place the image
      */
+    @SuppressWarnings("SameParameterValue")
     public ArtistArrayAdapter(
             Context context,
             int resource,
@@ -58,7 +59,7 @@ public class ArtistArrayAdapter extends ArrayAdapter<Artist> {
     }
 
     /**
-     * Ovverrides the ArrayAdapter's getView function so that we can render an individual list item
+     * Overrides the ArrayAdapter's getView function so that we can render an individual list item
      *
      * @param position Index of the data element we want to render
      * @param convertView The view for the list element (might be null if it hasn't been created yet

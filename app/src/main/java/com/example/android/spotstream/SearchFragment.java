@@ -36,7 +36,7 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
 public class SearchFragment extends Fragment {
     private final String LOG_TAG = SearchFragment.class.getSimpleName();
 
-    ArtistArrayAdapter mArtistAdapter;
+    private ArtistArrayAdapter mArtistAdapter;
 
     public SearchFragment() {
     }
@@ -125,8 +125,6 @@ public class SearchFragment extends Fragment {
                 new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        boolean handled = false;
-
                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                             new FetchArtistsTask().execute(v.getText().toString());
 
@@ -135,9 +133,9 @@ public class SearchFragment extends Fragment {
                             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
-                            handled = false;
+                            return false;
                         }
-                        return handled;
+                        return false;
                     }
                 }
         );
@@ -164,14 +162,14 @@ public class SearchFragment extends Fragment {
         super.onStart();
     }
 
-    public class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
+    private class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
         private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
 
         @Override
         protected Artist[] doInBackground (String... searchStr) {
-            ArrayList<Artist> artists = new ArrayList<Artist>();
+            ArrayList<Artist> artists = new ArrayList<>();
 
-            //This is where we conduct our serach for the artists using the Spotify API
+            //This is where we conduct our search for the artists using the Spotify API
             SpotifyApi api = new SpotifyApi();
 
             SpotifyService spotify = api.getService();
@@ -190,7 +188,8 @@ public class SearchFragment extends Fragment {
 
                 artists.add(new Artist(artistName, artistImageURL, artistSpotifyId));
             }
-            return (Artist[]) artists.toArray(new Artist[artists.size()]);
+            //noinspection RedundantCast,RedundantCast
+            return artists.toArray(new Artist[artists.size()]);
         }
 
         /**

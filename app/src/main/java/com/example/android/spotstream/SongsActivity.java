@@ -1,8 +1,8 @@
 package com.example.android.spotstream;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,7 +15,11 @@ public class SongsActivity extends ActionBarActivity {
 
         //Set the action bar subtitle as the artist's name (stored in EXTRA_TITLE)
         String artistName = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-        getSupportActionBar().setSubtitle(artistName);
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setSubtitle(artistName);
+        }
         setContentView(R.layout.activity_songs);
     }
 

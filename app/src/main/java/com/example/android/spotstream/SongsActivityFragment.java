@@ -28,7 +28,7 @@ import kaaes.spotify.webapi.android.models.Tracks;
  */
 public class SongsActivityFragment extends Fragment {
 
-    SongArrayAdapter mSongArrayAdapter;
+    private SongArrayAdapter mSongArrayAdapter;
 
     public SongsActivityFragment() {
     }
@@ -56,14 +56,14 @@ public class SongsActivityFragment extends Fragment {
 
 
 
-    public class FetchSongsTask extends AsyncTask<String, Void, Song[]> {
+    private class FetchSongsTask extends AsyncTask<String, Void, Song[]> {
         private final String LOG_TAG = FetchSongsTask.class.getSimpleName();
 
         @Override
         protected Song[] doInBackground (String... artistSpotifyIds) {
-            ArrayList<Song> songs = new ArrayList<Song>();
+            ArrayList<Song> songs = new ArrayList<>();
 
-            //This is where we conduct our serach for the artists using the Spotify API
+            //This is where we conduct our search for the artists using the Spotify API
             SpotifyApi api = new SpotifyApi();
 
             SpotifyService spotify = api.getService();
@@ -71,7 +71,7 @@ public class SongsActivityFragment extends Fragment {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String country = preferences.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_default));
 
-            Map<String,Object> options = new HashMap<String, Object>();
+            Map<String,Object> options = new HashMap<>();
             options.put("country", country);
 
             Tracks tracks = spotify.getArtistTopTrack(artistSpotifyIds[0], options);
@@ -91,14 +91,12 @@ public class SongsActivityFragment extends Fragment {
                 songs.add(new Song(songTitle + "\n" + songAlbumName, songImageUrl));
 
             }
-            return (Song[]) songs.toArray(new Song[songs.size()]);
+            return songs.toArray(new Song[songs.size()]);
         }
 
         @Override
         protected void onPostExecute( Song[] songs) {
             Activity activity = getActivity();
-
-            ListView songListView = (ListView)activity.findViewById(R.id.list_view_songs);
 
             //Clear the list adapter, and then add the newly found artists
             mSongArrayAdapter.clear();
