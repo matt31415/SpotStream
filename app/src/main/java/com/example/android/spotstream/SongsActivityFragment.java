@@ -30,8 +30,8 @@ import retrofit.RetrofitError;
  * A placeholder fragment containing a simple view.
  */
 public class SongsActivityFragment extends Fragment {
-
     private SongArrayAdapter mSongArrayAdapter;
+    private final String LOG_TAG = SongsActivityFragment.class.getSimpleName();
 
     public SongsActivityFragment() {
     }
@@ -51,13 +51,39 @@ public class SongsActivityFragment extends Fragment {
         ListView songListView = (ListView)view.findViewById(R.id.list_view_songs);
         songListView.setAdapter(mSongArrayAdapter);
 
-        String spotifyArtistId = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
-        new FetchSongsTask().execute(spotifyArtistId);
+        //We may already have the list of songs
+        if(savedInstanceState != null) {
+            if(savedInstanceState.getSerializable(getString(R.string.songs_activity_saved_songs_key)) != null) {
+                ArrayList<Song> savedSongs = (ArrayList<Song>) savedInstanceState.getSerializable(getString(R.string.songs_activity_saved_songs_key));
+                mSongArrayAdapter.addAll(savedSongs);
+            }
+        }
+        else {
+            String spotifyArtistId = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            new FetchSongsTask().execute(spotifyArtistId);
+        }
 
         return view;
     }
 
+    /**
+     * When we need to save the instance state, we'll store the list of songs.  Fortunately the list
+     * is trivial to serialize!
+     * @param state State bundle into which the state should be written
+     */
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
 
+        //Convert list of songs to an arrayList
+        ArrayList<Song> songs = new ArrayList<>();
+        for (int songIdx = 0; songIdx < mSongArrayAdapter.getCount(); songIdx++) {
+            songs.add(mSongArrayAdapter.getItem(songIdx));
+        }
+
+        //save songs in bundle
+        state.putSerializable(getString(R.string.songs_activity_saved_songs_key), songs);
+    }
 
     private class FetchSongsTask extends AsyncTask<String, Void, Song[]> {
         private final String LOG_TAG = FetchSongsTask.class.getSimpleName();

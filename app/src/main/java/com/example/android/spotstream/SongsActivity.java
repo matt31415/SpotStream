@@ -8,6 +8,7 @@ import android.view.MenuItem;
 
 
 public class SongsActivity extends ActionBarActivity {
+    private final String LOG_TAG = SongsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,4 +48,5 @@ public class SongsActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

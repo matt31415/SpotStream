@@ -4,7 +4,7 @@ package com.example.android.spotstream;
  * The Artist class is a pure data storage class that will be used to store information
  * about each artist.
  */
-public class Artist {
+public class Artist implements java.io.Serializable {
     public String mName;
     public String mImageUrl;
     public String mSpotifyId;

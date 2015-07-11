@@ -5,7 +5,7 @@ package com.example.android.spotstream;
  *
  * This is a trivial data structure to store information about a single spotify song
  */
-public class Song {
+public class Song implements java.io.Serializable {
     String mTitle;
     String mImageUrl;
 

@@ -123,6 +123,15 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        //We may already have the list of artists
+        if(savedInstanceState != null) {
+            if(savedInstanceState.getSerializable(getString(R.string.main_activity_saved_artists_key)) != null) {
+                ArrayList<Artist> savedArtists = (ArrayList<Artist>) savedInstanceState.getSerializable(getString(R.string.main_activity_saved_artists_key));
+                mArtistAdapter.addAll(savedArtists);
+            }
+        }
+
+
         // Set up a handler for the search string
         ((EditText)view.findViewById(R.id.edit_text_artist_search)).setOnEditorActionListener(
                 new TextView.OnEditorActionListener() {
@@ -147,22 +156,22 @@ public class SearchFragment extends Fragment {
     }
 
     /**
-     * By overriding the onStart method, we can check to see if there's any text in the search field
-     * and use it to re-run the search.  (This is perhaps a bit wasteful, since we could just store
-     * the state of the list view, but I don't think it's a major issue, since this app is going to
-     * be used heavily for searching, so if the network connection is slow the app will be annoying
-     * all the time, not just when orientation changes.)
+     * When we need to save the instance state, we'll store the list of artists.  Fortunately the list
+     * is trivial to serialize!
+     * @param state State bundle into which the state should be written
      */
     @Override
-    public void onStart() {
-        EditText searchEdit = ((EditText) getView().findViewById(R.id.edit_text_artist_search));
-        String searchString = searchEdit.getText().toString();
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
 
-        if(searchString.length() > 0) {
-            new FetchArtistsTask().execute(searchString);
+        //Convert list of artists to an arrayList
+        ArrayList<Artist> artists = new ArrayList<>();
+        for (int artistIdx = 0; artistIdx < mArtistAdapter.getCount(); artistIdx++) {
+            artists.add(mArtistAdapter.getItem(artistIdx));
         }
 
-        super.onStart();
+        //save songs in bundle
+        state.putSerializable(getString(R.string.main_activity_saved_artists_key), artists);
     }
 
     private class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {
