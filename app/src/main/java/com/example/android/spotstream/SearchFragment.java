@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,8 +27,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyError;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import retrofit.RetrofitError;
 
 
 /**
@@ -171,22 +174,30 @@ public class SearchFragment extends Fragment {
 
             //This is where we conduct our search for the artists using the Spotify API
             SpotifyApi api = new SpotifyApi();
+            ArtistsPager artistsPager = new ArtistsPager();
 
-            SpotifyService spotify = api.getService();
-            ArtistsPager artistsPager = spotify.searchArtists(searchStr[0]);
+            try {
+                SpotifyService spotify = api.getService();
+                artistsPager = spotify.searchArtists(searchStr[0]);
+            }
+            catch(RetrofitError error) {
+                SpotifyError spotifyError = SpotifyError.fromRetrofitError(error);
+                Log.e(LOG_TAG, "Spotify API Error: " + spotifyError.toString());
+            }
 
-            for (kaaes.spotify.webapi.android.models.Artist a : artistsPager.artists.items) {
-                String artistName = a.name;
-                String artistSpotifyId = a.id;
-                String artistImageURL;
-                if(!a.images.isEmpty()) {
-                    artistImageURL = a.images.get(0).url;
+            if(artistsPager.artists != null) {
+                for (kaaes.spotify.webapi.android.models.Artist a : artistsPager.artists.items) {
+                    String artistName = a.name;
+                    String artistSpotifyId = a.id;
+                    String artistImageURL;
+                    if (!a.images.isEmpty()) {
+                        artistImageURL = a.images.get(0).url;
+                    } else {
+                        artistImageURL = null;
+                    }
+
+                    artists.add(new Artist(artistName, artistImageURL, artistSpotifyId));
                 }
-                else {
-                    artistImageURL = null;
-                }
-
-                artists.add(new Artist(artistName, artistImageURL, artistSpotifyId));
             }
             //noinspection RedundantCast,RedundantCast
             return artists.toArray(new Artist[artists.size()]);

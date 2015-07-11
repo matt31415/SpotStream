@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyError;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
+import retrofit.RetrofitError;
 
 
 /**
@@ -74,23 +77,32 @@ public class SongsActivityFragment extends Fragment {
             Map<String,Object> options = new HashMap<>();
             options.put("country", country);
 
-            Tracks tracks = spotify.getArtistTopTrack(artistSpotifyIds[0], options);
-
-            for(Track t: tracks.tracks) {
-                String songTitle = t.name;
-                String songAlbumName = t.album.name;
-                String songImageUrl;
-
-                if(!t.album.images.isEmpty()) {
-                    songImageUrl = t.album.images.get(0).url;
-                }
-                else {
-                    songImageUrl = null;
-                }
-
-                songs.add(new Song(songTitle + "\n" + songAlbumName, songImageUrl));
-
+            Tracks tracks = new Tracks();
+            try {
+                tracks = spotify.getArtistTopTrack(artistSpotifyIds[0], options);
             }
+            catch (RetrofitError error) {
+                SpotifyError spotifyError = SpotifyError.fromRetrofitError(error);
+                Log.e(LOG_TAG, spotifyError.toString());
+            }
+
+            if( tracks.tracks != null) {
+                for (Track t : tracks.tracks) {
+                    String songTitle = t.name;
+                    String songAlbumName = t.album.name;
+                    String songImageUrl;
+
+                    if (!t.album.images.isEmpty()) {
+                        songImageUrl = t.album.images.get(0).url;
+                    } else {
+                        songImageUrl = null;
+                    }
+
+                    songs.add(new Song(songTitle + "\n" + songAlbumName, songImageUrl));
+
+                }
+            }
+
             return songs.toArray(new Song[songs.size()]);
         }
 
