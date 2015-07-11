@@ -196,7 +196,6 @@ public class SearchFragment extends Fragment {
          * After the task has completed, we'll want to update the artist adapter with the new search results.
          * @param artists - List of artists returned
          */
-        //TODO: Handle the case where no results are returned
         @Override
         protected void onPostExecute( Artist[] artists) {
             Activity activity = getActivity();
