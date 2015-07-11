@@ -1,7 +1,8 @@
 package com.example.android.spotstream;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -31,6 +32,8 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent openSettingsIntent = new Intent(this, com.example.android.spotstream.SettingsActivity.class);
+            startActivity(openSettingsIntent);
             return true;
         }
 

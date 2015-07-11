@@ -3,6 +3,7 @@ package com.example.android.spotstream;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -58,9 +59,16 @@ public class SearchFragment extends Fragment {
                 // This logic relies on the fact that the we already know that the click event is
                 // taking place inside the EditText, so bounds-checking is super-easy
                 if(event.getAction() == MotionEvent.ACTION_UP) {
+                    //The X Icon (drawable_right) may not actually exist.  If that's the case we can
+                    // skip this whole exercise
+                    Drawable xIconDrawable = searchEdit.getCompoundDrawables()[DRAWABLE_RIGHT];
+                    if(xIconDrawable == null) {
+                        return false;
+                    }
+
                     float rawX = event.getRawX();
                     float editRightEdge = searchEdit.getRight();
-                    float drawableWidth = searchEdit.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width();
+                    float drawableWidth = xIconDrawable.getBounds().width();
 
                     if(rawX > editRightEdge - drawableWidth) {
                         searchEdit.setText("");

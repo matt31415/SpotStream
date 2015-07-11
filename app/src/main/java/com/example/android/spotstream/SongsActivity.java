@@ -36,6 +36,8 @@ public class SongsActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent openSettingsIntent = new Intent(this, com.example.android.spotstream.SettingsActivity.class);
+            startActivity(openSettingsIntent);
             return true;
         }
 

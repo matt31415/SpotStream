@@ -2,8 +2,10 @@ package com.example.android.spotstream;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,8 +68,9 @@ public class SongsActivityFragment extends Fragment {
 
             SpotifyService spotify = api.getService();
 
-            // TODO: Make "county" a setting in the preferneces menu
-            String country = "us";
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String country = preferences.getString(getString(R.string.pref_country_key), getString(R.string.pref_country_default));
+
             Map<String,Object> options = new HashMap<String, Object>();
             options.put("country", country);
 
