@@ -33,25 +33,26 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
 
         <!-- TODO: Add a scrub bar -->
         <!-- TODO: Clean up the layout and styling of these buttons -->
 
-        <ImageView
-            android:id="@+id/player_prev_icon"
+        <ImageButton
+            android:id="@+id/player_prev_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_previous"/>
 
-        <ImageView
-            android:id="@+id/player_play_pause_icon"
+        <ImageButton
+            android:id="@+id/player_play_pause_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_play"/>
 
-        <ImageView
-            android:id="@+id/player_next_icon"
+        <ImageButton
+            android:id="@+id/player_next_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_media_next"/>
