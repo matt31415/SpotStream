@@ -11,13 +11,26 @@
         android:id="@+id/list_item_song_image"
         android:src="@drawable/note" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="100dp"
-        android:id="@+id/list_item_song_name"
-        android:gravity="left|center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeight"
-        android:layout_weight="1"
-        android:paddingLeft="10dp" />
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/list_item_song_name"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/list_item_album_name"
+            android:paddingLeft="10dp" />
+
+    </LinearLayout>
 
 </LinearLayout>

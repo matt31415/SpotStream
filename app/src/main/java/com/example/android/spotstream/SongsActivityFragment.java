@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,6 +40,8 @@ public class SongsActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        //TODO: Make sure that when you hit the back button from the player the song list reloads
         View view =  inflater.inflate(R.layout.fragment_songs, container, false);
 
         //Set up the list of artists
@@ -47,9 +50,21 @@ public class SongsActivityFragment extends Fragment {
                 R.layout.list_item_song,
                 new ArrayList<Song>(),
                 R.id.list_item_song_name,
+                R.id.list_item_album_name,
                 R.id.list_item_song_image);
         ListView songListView = (ListView)view.findViewById(R.id.list_view_songs);
         songListView.setAdapter(mSongArrayAdapter);
+
+        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Song song = mSongArrayAdapter.getItem(position);
+
+                Intent playSongsIntent = new Intent(getActivity(), PlayerActivity.class);
+                playSongsIntent.putExtra(getString(R.string.player_songs_key), song);
+                startActivity(playSongsIntent);
+            }
+        });
 
         //We may already have the list of songs
         if(savedInstanceState != null) {
@@ -115,6 +130,7 @@ public class SongsActivityFragment extends Fragment {
             if( tracks.tracks != null) {
                 for (Track t : tracks.tracks) {
                     String songTitle = t.name;
+                    String songArtist = t.artists.get(0).name;
                     String songAlbumName = t.album.name;
                     String songImageUrl;
 
@@ -124,7 +140,7 @@ public class SongsActivityFragment extends Fragment {
                         songImageUrl = null;
                     }
 
-                    songs.add(new Song(songTitle + "\n" + songAlbumName, songImageUrl));
+                    songs.add(new Song(songTitle, songArtist, songAlbumName, songImageUrl));
 
                 }
             }

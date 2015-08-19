@@ -7,10 +7,14 @@ package com.example.android.spotstream;
  */
 public class Song implements java.io.Serializable {
     String mTitle;
+    String mArtist;
+    String mAlbum;
     String mImageUrl;
 
-    Song(String title, String imageURL) {
+    Song(String title, String artist, String album, String imageURL) {
         mTitle = title;
+        mArtist = artist;
+        mAlbum = album;
         mImageUrl = imageURL;
     }
 }

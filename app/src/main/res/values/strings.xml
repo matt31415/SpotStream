@@ -7,5 +7,7 @@
     <string name="no_songs_found_toast">No songs found</string>
     <string name="songs_activity_saved_songs_key">SONGS</string>
     <string name="main_activity_saved_artists_key">ARTISTS</string>
+    <string name="title_activity_player">Player</string>
+    <string name="player_songs_key">PLAY_SONGS_SONGS</string>
 
 </resources>

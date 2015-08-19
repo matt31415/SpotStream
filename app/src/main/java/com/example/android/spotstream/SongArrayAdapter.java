@@ -25,6 +25,7 @@ public class SongArrayAdapter extends ArrayAdapter<Song>{
     private Context mContext;
     private int mLayoutResource;
     private int mTitleTextResource;
+    private int mAlbumTextResource;
     private int mImageResource;
 
     private ArrayList<Song> mSongData;
@@ -44,6 +45,7 @@ public class SongArrayAdapter extends ArrayAdapter<Song>{
             int resource,
             ArrayList<Song> objects,
             int titleTextResource,
+            int albumTextResource,
             int imageResource
     ) {
         super(context,resource,objects);
@@ -52,6 +54,7 @@ public class SongArrayAdapter extends ArrayAdapter<Song>{
         mLayoutResource = resource;
         mSongData = objects;
         mTitleTextResource = titleTextResource;
+        mAlbumTextResource = albumTextResource;
         mImageResource = imageResource;
     }
 
@@ -92,6 +95,9 @@ public class SongArrayAdapter extends ArrayAdapter<Song>{
 
         TextView nameText = (TextView)convertView.findViewById(mTitleTextResource);
         nameText.setText(songInfo.mTitle);
+
+        TextView albumText = (TextView)convertView.findViewById(mAlbumTextResource);
+        albumText.setText(songInfo.mAlbum);
 
         return convertView;
 
