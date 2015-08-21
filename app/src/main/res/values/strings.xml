@@ -8,6 +8,7 @@
     <string name="songs_activity_saved_songs_key">SONGS</string>
     <string name="main_activity_saved_artists_key">ARTISTS</string>
     <string name="title_activity_player">Player</string>
-    <string name="player_songs_key">PLAY_SONGS_SONGS</string>
+    <string name="player_songs_key">PLAYER_SONGS</string>
+    <string name="player_song_position_key">PLAYER_SONG_POSITION</string>
 
 </resources>

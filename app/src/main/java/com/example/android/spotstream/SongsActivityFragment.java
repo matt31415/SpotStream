@@ -58,10 +58,18 @@ public class SongsActivityFragment extends Fragment {
         songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Song song = mSongArrayAdapter.getItem(position);
+                // We're going to pass all of the songs into the intent.  This is maybe a bit waasteful,
+                // but each song is really cheap (in terms of data), and we're limited to 10 songs
+                // by the current implementation of the API.  So, passing in an array to the intent
+                // is much simpler than doing something like creating a content provider.
+                ArrayList<Song> songs = new ArrayList<Song>(mSongArrayAdapter.getCount());
+                for (int i=0; i < mSongArrayAdapter.getCount(); i++) {
+                    songs.add(mSongArrayAdapter.getItem(i));
+                }
 
                 Intent playSongsIntent = new Intent(getActivity(), PlayerActivity.class);
-                playSongsIntent.putExtra(getString(R.string.player_songs_key), song);
+                playSongsIntent.putExtra(getString(R.string.player_songs_key), songs);
+                playSongsIntent.putExtra(getString(R.string.player_song_position_key), position);
                 startActivity(playSongsIntent);
             }
         });
@@ -129,9 +137,6 @@ public class SongsActivityFragment extends Fragment {
 
             if( tracks.tracks != null) {
                 for (Track t : tracks.tracks) {
-                    String songTitle = t.name;
-                    String songArtist = t.artists.get(0).name;
-                    String songAlbumName = t.album.name;
                     String songImageUrl;
 
                     if (!t.album.images.isEmpty()) {
@@ -140,7 +145,7 @@ public class SongsActivityFragment extends Fragment {
                         songImageUrl = null;
                     }
 
-                    songs.add(new Song(songTitle, songArtist, songAlbumName, songImageUrl));
+                    songs.add(new Song(t.name, t.artists.get(0).name, t.album.name, songImageUrl, t.preview_url));
 
                 }
             }

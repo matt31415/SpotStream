@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -29,6 +32,9 @@ public class PlayerFragment extends Fragment {
 
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
+    private ImageButton mPlayPauseButton;
+
+    private SeekBar mSeekBar;
 
     private enum MediaPlayerState {
         IDLE,
@@ -54,43 +60,27 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_player, container, false);
 
+        //TODO: Make this work after rotation
+
         mSongList = (ArrayList<Song>) getActivity().getIntent().getSerializableExtra(getString(R.string.player_songs_key));
         mCurrSongPosition = getActivity().getIntent().getIntExtra(getString(R.string.player_song_position_key), 0);
 
         recreateView(view);
 
-        final ImageButton playPauseButton = (ImageButton) view.findViewById(R.id.player_play_pause_button);
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
+        mPlayPauseButton = (ImageButton) view.findViewById(R.id.player_play_pause_button);
+        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mMediaPlayerState == MediaPlayerState.IDLE) {
-                    // This code was heavily influenced by:
-                    // http://stackoverflow.com/questions/23309857/android-correct-usage-of-prepareasync-in-media-player-activity
-                    try {
-                        mMediaPlayer.setDataSource(mSongList.get(mCurrSongPosition).mPreviewUrl);
-                        mMediaPlayer.prepareAsync();
-                        playPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
-                    } catch (IOException e) {
-                        Toast.makeText(view.getContext(), "Track preview not found", Toast.LENGTH_SHORT).show();
-                    }
-
-                    mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mp) {
-                            mMediaPlayerState = MediaPlayerState.PREPARED;
-                            mp.start();
-                            mMediaPlayerState = MediaPlayerState.STARTED;
-                            playPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
-                        }
-                    });
+                    PrepareAndStartPlayer();
                 } else if (mMediaPlayerState == MediaPlayerState.STARTED) {
                     mMediaPlayer.pause();
                     mMediaPlayerState = MediaPlayerState.PAUSED;
-                    playPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_play));
+                    mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_play));
                 } else if (mMediaPlayerState == MediaPlayerState.PAUSED) {
                     mMediaPlayer.start();
                     mMediaPlayerState = MediaPlayerState.STARTED;
-                    playPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+                    mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
                 }
             }
         });
@@ -111,6 +101,17 @@ public class PlayerFragment extends Fragment {
             }
         });
 
+        mSeekBar = (SeekBar) view.findViewById(R.id.player_seek_bar);
+
+        Timer scrubTimer = new Timer();
+        scrubTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mMediaPlayerState == MediaPlayerState.STARTED) {
+                    mSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
+                }
+            }
+        }, 0, 1000);
         return view;
     }
 
@@ -191,23 +192,34 @@ public class PlayerFragment extends Fragment {
         } else if (mMediaPlayerState == MediaPlayerState.STARTED) {
             mMediaPlayer.reset();
             mMediaPlayerState = MediaPlayerState.IDLE;
-            try {
-                mMediaPlayer.setDataSource(mSongList.get(mCurrSongPosition).mPreviewUrl);
-                mMediaPlayer.prepareAsync();
-            } catch (IOException e) {
-                Toast.makeText(view.getContext(), "Track preview not found", Toast.LENGTH_SHORT).show();
-            }
-
-            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mMediaPlayerState = MediaPlayerState.PREPARED;
-                    mp.start();
-                    mMediaPlayerState = MediaPlayerState.STARTED;
-                }
-            });
-
+            PrepareAndStartPlayer();
         }
 
     }
+
+    private void PrepareAndStartPlayer() {
+        // This code was heavily influenced by:
+        // http://stackoverflow.com/questions/23309857/android-correct-usage-of-prepareasync-in-media-player-activity
+        try {
+            mMediaPlayer.setDataSource(mSongList.get(mCurrSongPosition).mPreviewUrl);
+            mMediaPlayer.prepareAsync();
+            mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+        } catch (IOException e) {
+            Toast.makeText(getView().getContext(), "Track preview not found", Toast.LENGTH_SHORT).show();
+        }
+
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mMediaPlayerState = MediaPlayerState.PREPARED;
+                mp.start();
+                mMediaPlayerState = MediaPlayerState.STARTED;
+                mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+                mSeekBar.setMax(mMediaPlayer.getDuration());
+                mSeekBar.setProgress(0);
+
+            }
+        });
+    }
+
 }

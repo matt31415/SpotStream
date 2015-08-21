@@ -10,11 +10,13 @@ public class Song implements java.io.Serializable {
     String mArtist;
     String mAlbum;
     String mImageUrl;
+    String mPreviewUrl;
 
-    Song(String title, String artist, String album, String imageURL) {
+    Song(String title, String artist, String album, String imageURL, String previewUrl) {
         mTitle = title;
         mArtist = artist;
         mAlbum = album;
         mImageUrl = imageURL;
+        mPreviewUrl = previewUrl;
     }
 }
