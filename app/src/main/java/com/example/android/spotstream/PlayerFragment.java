@@ -4,6 +4,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class PlayerFragment extends Fragment {
+    private final String LOG_TAG = PlayerFragment.class.getSimpleName();
 
     private MediaPlayer mMediaPlayer;
     private MediaPlayerState mMediaPlayerState;
@@ -35,6 +38,8 @@ public class PlayerFragment extends Fragment {
     private ImageButton mPlayPauseButton;
 
     private SeekBar mSeekBar;
+
+    private TextView mSeekEndTimeText;
 
     private enum MediaPlayerState {
         IDLE,
@@ -65,14 +70,16 @@ public class PlayerFragment extends Fragment {
         mSongList = (ArrayList<Song>) getActivity().getIntent().getSerializableExtra(getString(R.string.player_songs_key));
         mCurrSongPosition = getActivity().getIntent().getIntExtra(getString(R.string.player_song_position_key), 0);
 
-        recreateView(view);
-
         mPlayPauseButton = (ImageButton) view.findViewById(R.id.player_play_pause_button);
         mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mMediaPlayerState == MediaPlayerState.IDLE) {
-                    PrepareAndStartPlayer();
+                    prepareAndMaybeStartPlayer(true);
+                } else if (mMediaPlayerState == MediaPlayerState.PREPARED) {
+                    mMediaPlayer.start();
+                    mMediaPlayerState = MediaPlayerState.STARTED;
+                    mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
                 } else if (mMediaPlayerState == MediaPlayerState.STARTED) {
                     mMediaPlayer.pause();
                     mMediaPlayerState = MediaPlayerState.PAUSED;
@@ -101,8 +108,30 @@ public class PlayerFragment extends Fragment {
             }
         });
 
+        mSeekEndTimeText = (TextView) view.findViewById(R.id.player_seek_end);
         mSeekBar = (SeekBar) view.findViewById(R.id.player_seek_bar);
 
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser &&
+                        (mMediaPlayerState == MediaPlayerState.STARTED || mMediaPlayerState == MediaPlayerState.PAUSED)) {
+                    mMediaPlayer.seekTo(mSeekBar.getProgress());
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        //Inspired by: http://stackoverflow.com/questions/10848960/run-thread-periodically
         Timer scrubTimer = new Timer();
         scrubTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -111,7 +140,10 @@ public class PlayerFragment extends Fragment {
                     mSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
                 }
             }
-        }, 0, 1000);
+        }, 0, 100);
+
+        recreateView(view);
+        prepareAndMaybeStartPlayer(false);
         return view;
     }
 
@@ -189,21 +221,28 @@ public class PlayerFragment extends Fragment {
         if (mMediaPlayerState == MediaPlayerState.IDLE || mMediaPlayerState == MediaPlayerState.PAUSED) {
             mMediaPlayer.reset();
             mMediaPlayerState = MediaPlayerState.IDLE;
+            prepareAndMaybeStartPlayer(false);
         } else if (mMediaPlayerState == MediaPlayerState.STARTED) {
             mMediaPlayer.reset();
             mMediaPlayerState = MediaPlayerState.IDLE;
-            PrepareAndStartPlayer();
+            prepareAndMaybeStartPlayer(true);
         }
 
     }
 
-    private void PrepareAndStartPlayer() {
+    /**
+     *
+     * @param start  If this is set to true, automatically start playing after player is prepared.
+     */
+    private void prepareAndMaybeStartPlayer(final boolean start) {
         // This code was heavily influenced by:
         // http://stackoverflow.com/questions/23309857/android-correct-usage-of-prepareasync-in-media-player-activity
         try {
             mMediaPlayer.setDataSource(mSongList.get(mCurrSongPosition).mPreviewUrl);
             mMediaPlayer.prepareAsync();
-            mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+            if(start) {
+                mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+            }
         } catch (IOException e) {
             Toast.makeText(getView().getContext(), "Track preview not found", Toast.LENGTH_SHORT).show();
         }
@@ -212,12 +251,23 @@ public class PlayerFragment extends Fragment {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 mMediaPlayerState = MediaPlayerState.PREPARED;
-                mp.start();
-                mMediaPlayerState = MediaPlayerState.STARTED;
-                mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+                if(start) {
+                    mp.start();
+                    mMediaPlayerState = MediaPlayerState.STARTED;
+
+                    //Flip the play/pause button
+                    mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_pause));
+                }
+
+                //Set up the seek bar and its labels
+                Log.d(LOG_TAG,"Thing 2");
                 mSeekBar.setMax(mMediaPlayer.getDuration());
                 mSeekBar.setProgress(0);
 
+                //Set the start and end time
+                long endTimeSecs = TimeUnit.MILLISECONDS.toSeconds(mMediaPlayer.getDuration());
+                String endTimeStr = String.format("%d:%02d", endTimeSecs/60, endTimeSecs%60);
+                mSeekEndTimeText.setText(endTimeStr);
             }
         });
     }

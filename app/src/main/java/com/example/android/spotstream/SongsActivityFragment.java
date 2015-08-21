@@ -41,7 +41,6 @@ public class SongsActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //TODO: Make sure that when you hit the back button from the player the song list reloads
         View view =  inflater.inflate(R.layout.fragment_songs, container, false);
 
         //Set up the list of artists
