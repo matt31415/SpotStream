@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="grey">#cccccc</color>
+    <color name="spotstream_cyan">#00bcd4</color>
+    <color name="spotstream_dark_cyan">#00838f</color>
+    <color name="spotstream_light_cyan">#80deea</color>
+
+</resources>

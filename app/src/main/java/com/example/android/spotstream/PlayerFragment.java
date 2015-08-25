@@ -1,9 +1,10 @@
 package com.example.android.spotstream;
 
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayerFragment extends Fragment {
+public class PlayerFragment extends DialogFragment {
     private final String LOG_TAG = PlayerFragment.class.getSimpleName();
 
     private MediaPlayer mMediaPlayer;
@@ -40,6 +41,11 @@ public class PlayerFragment extends Fragment {
     private SeekBar mSeekBar;
 
     private TextView mSeekEndTimeText;
+
+    private boolean mTrackChangeEvent;
+
+    private static final String SONGS_LIST_KEY = "SongsList";
+    private static final String POSITION_KEY = "Position";
 
     private enum MediaPlayerState {
         IDLE,
@@ -58,6 +64,28 @@ public class PlayerFragment extends Fragment {
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayerState = MediaPlayerState.IDLE;
+        mTrackChangeEvent = false;
+    }
+
+    /**
+     * Returns a new copy of a PlayerFragment
+     * @param songs ArrayList of song items for the songs to be included in the player
+     * @param position the index of the song that should be displayed as the current song.
+     * @return
+     */
+    public static PlayerFragment newInstance(ArrayList<Song> songs, int position) {
+        PlayerFragment playerFrag = new PlayerFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable(SONGS_LIST_KEY, songs);
+        args.putInt(POSITION_KEY, position);
+
+        playerFrag.setArguments(args);
+
+        playerFrag.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+
+
+        return playerFrag;
     }
 
     @Override
@@ -65,10 +93,15 @@ public class PlayerFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_player, container, false);
 
-        //TODO: Make this work after rotation
-
-        mSongList = (ArrayList<Song>) getActivity().getIntent().getSerializableExtra(getString(R.string.player_songs_key));
-        mCurrSongPosition = getActivity().getIntent().getIntExtra(getString(R.string.player_song_position_key), 0);
+        Bundle fragArgs = getArguments();
+        if(fragArgs != null) {
+            mSongList = (ArrayList<Song>) fragArgs.getSerializable(SONGS_LIST_KEY);
+            mCurrSongPosition = fragArgs.getInt(POSITION_KEY);
+        }
+        else {
+            mSongList = (ArrayList<Song>) getActivity().getIntent().getSerializableExtra(getString(R.string.player_songs_key));
+            mCurrSongPosition = getActivity().getIntent().getIntExtra(getString(R.string.player_song_position_key), 0);
+        }
 
         mPlayPauseButton = (ImageButton) view.findViewById(R.id.player_play_pause_button);
         mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -96,15 +129,45 @@ public class PlayerFragment extends Fragment {
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mTrackChangeEvent = true;
                 changeSong(v, Direction.NEXT);
+                mTrackChangeEvent = false;
             }
         });
+        if(mCurrSongPosition == mSongList.size() - 1) {
+            mNextButton.setEnabled(false);
+            mNextButton.setImageAlpha(50);
+        }
+
 
         mPrevButton = (ImageButton) view.findViewById(R.id.player_prev_button);
         mPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mTrackChangeEvent = true;
                 changeSong(v, Direction.PREV);
+                mTrackChangeEvent = false;
+            }
+        });
+        if(mCurrSongPosition == 0) {
+            mPrevButton.setEnabled(false);
+            mPrevButton.setImageAlpha(50);
+        }
+
+        // Set up the player so that when it reaches the end of a song, it goes to the next if possible,
+        // otherwise it stops.
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                if(mTrackChangeEvent) {
+                    return;
+                }
+                if (mCurrSongPosition == mSongList.size()-1) {
+                    mPlayPauseButton.setImageDrawable(getActivity().getDrawable(android.R.drawable.ic_media_play));
+                    mMediaPlayerState = MediaPlayerState.PAUSED;
+                } else {
+                    mNextButton.performClick();
+                }
             }
         });
 
@@ -143,10 +206,9 @@ public class PlayerFragment extends Fragment {
         }, 0, 100);
 
         recreateView(view);
-        prepareAndMaybeStartPlayer(false);
+        prepareAndMaybeStartPlayer(true);
         return view;
     }
-
 
     /**
      * Redraws (or draws for the first time) the view based on the value of mCurrSongPosition
@@ -271,5 +333,25 @@ public class PlayerFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+
+        mMediaPlayer.stop();
+        mMediaPlayerState = MediaPlayerState.STOPPED;
+        mMediaPlayer.release();
+    }
+
+    public void onStop() {
+        super.onStop();
+
+        if(mMediaPlayerState == MediaPlayerState.STARTED) {
+            mMediaPlayer.stop();
+            mMediaPlayerState = MediaPlayerState.STOPPED;
+            mMediaPlayer.release();
+        }
+    }
+
 
 }

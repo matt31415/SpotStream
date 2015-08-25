@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+    </style>
+
+    <!-- Style for artists listview -->
+    <style name="ArtistListStyle">
+        <!-- On tablets, we're going to use a style to show that the list item has been selected -->
+        <item name="android:choiceMode">singleChoice</item>
+    </style>
+
+</resources>

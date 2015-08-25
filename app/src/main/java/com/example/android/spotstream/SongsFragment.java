@@ -30,12 +30,26 @@ import retrofit.RetrofitError;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SongsActivityFragment extends Fragment {
+public class SongsFragment extends Fragment {
     private SongArrayAdapter mSongArrayAdapter;
-    private final String LOG_TAG = SongsActivityFragment.class.getSimpleName();
+    private final String LOG_TAG = SongsFragment.class.getSimpleName();
+    private Callback mCallback;
 
-    public SongsActivityFragment() {
+    private static final String SPOTIFY_ARTIST_ID_KEY = "SpotifyArtistId";
+
+    public SongsFragment() {
     }
+
+    public static SongsFragment newInstance(String spotifyArtistId) {
+        SongsFragment songsFrag = new SongsFragment();
+
+        Bundle args = new Bundle();
+        args.putString(SPOTIFY_ARTIST_ID_KEY, spotifyArtistId);
+        songsFrag.setArguments(args);
+
+        return songsFrag;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,14 +76,11 @@ public class SongsActivityFragment extends Fragment {
                 // by the current implementation of the API.  So, passing in an array to the intent
                 // is much simpler than doing something like creating a content provider.
                 ArrayList<Song> songs = new ArrayList<Song>(mSongArrayAdapter.getCount());
-                for (int i=0; i < mSongArrayAdapter.getCount(); i++) {
+                for (int i = 0; i < mSongArrayAdapter.getCount(); i++) {
                     songs.add(mSongArrayAdapter.getItem(i));
                 }
 
-                Intent playSongsIntent = new Intent(getActivity(), PlayerActivity.class);
-                playSongsIntent.putExtra(getString(R.string.player_songs_key), songs);
-                playSongsIntent.putExtra(getString(R.string.player_song_position_key), position);
-                startActivity(playSongsIntent);
+                mCallback.startPlayer(songs, position);
             }
         });
 
@@ -81,7 +92,18 @@ public class SongsActivityFragment extends Fragment {
             }
         }
         else {
-            String spotifyArtistId = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            String spotifyArtistId;
+
+            // The artist ID could be in the fragment arguments (if we're in dual-pane mode), or it
+            // could be in the intent (if we're in single-pane mode).
+            Bundle fragArgs = getArguments();
+            if (fragArgs != null) {
+                spotifyArtistId = fragArgs.getString(SPOTIFY_ARTIST_ID_KEY);
+            }
+            else {
+                spotifyArtistId = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            }
+
             new FetchSongsTask().execute(spotifyArtistId);
         }
 
@@ -106,6 +128,33 @@ public class SongsActivityFragment extends Fragment {
         //save songs in bundle
         state.putSerializable(getString(R.string.songs_activity_saved_songs_key), songs);
     }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * SongsFragment Callback for when an item has been selected.
+         */
+        public void startPlayer(ArrayList<Song> songs, int position);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        //Make sure that the parent activity has implemented the onItemSelected callback interface
+        try {
+            mCallback = (Callback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement Callback");
+        }
+
+    }
+
 
     private class FetchSongsTask extends AsyncTask<String, Void, Song[]> {
         private final String LOG_TAG = FetchSongsTask.class.getSimpleName();

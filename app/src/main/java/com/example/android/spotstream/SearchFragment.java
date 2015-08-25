@@ -2,7 +2,6 @@ package com.example.android.spotstream;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,6 +39,7 @@ public class SearchFragment extends Fragment {
     private final String LOG_TAG = SearchFragment.class.getSimpleName();
 
     private ArtistArrayAdapter mArtistAdapter;
+    private Callback mCallback;
 
     public SearchFragment() {
     }
@@ -47,7 +47,7 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.search_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         // Make the X on the search edit text clear out the search string.  The X is in the
         // drawable right position
@@ -116,10 +116,7 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Artist artist = mArtistAdapter.getItem(position);
 
-                Intent viewSongsIntent = new Intent(getActivity(), SongsActivity.class);
-                viewSongsIntent.putExtra(Intent.EXTRA_TEXT, artist.mSpotifyId);
-                viewSongsIntent.putExtra(Intent.EXTRA_TITLE, artist.mName);
-                startActivity(viewSongsIntent);
+                mCallback.onItemSelected(artist.mSpotifyId, artist.mName);
             }
         });
 
@@ -172,6 +169,32 @@ public class SearchFragment extends Fragment {
 
         //save songs in bundle
         state.putSerializable(getString(R.string.main_activity_saved_artists_key), artists);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * SearchFragment Callback for when an item has been selected.
+         */
+        public void onItemSelected(String spotifyArtistId, String artistName);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        //Make sure that the parent activity has implemented the onItemSelected callback interface
+        try {
+            mCallback = (Callback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement Callback");
+        }
+
     }
 
     private class FetchArtistsTask extends AsyncTask<String, Void, Artist[]> {

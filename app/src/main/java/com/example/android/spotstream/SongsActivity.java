@@ -2,13 +2,20 @@ package com.example.android.spotstream;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 
-public class SongsActivity extends ActionBarActivity {
+
+public class SongsActivity extends ActionBarActivity
+    implements SongsFragment.Callback{
     private final String LOG_TAG = SongsActivity.class.getSimpleName();
+    private static final String PLAYER_FRAGMENT_TAG = "PlayerFragment";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,4 +56,12 @@ public class SongsActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void startPlayer(ArrayList<Song> songs, int position) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        DialogFragment playerFrag = PlayerFragment.newInstance(songs, position);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.add(android.R.id.content, playerFrag)
+                .addToBackStack(null).commit();
+    }
 }
