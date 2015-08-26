@@ -313,7 +313,7 @@ public class PlayerFragment extends DialogFragment {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 mMediaPlayerState = MediaPlayerState.PREPARED;
-                if(start) {
+                if (start) {
                     mp.start();
                     mMediaPlayerState = MediaPlayerState.STARTED;
 
@@ -322,13 +322,13 @@ public class PlayerFragment extends DialogFragment {
                 }
 
                 //Set up the seek bar and its labels
-                Log.d(LOG_TAG,"Thing 2");
+                Log.d(LOG_TAG, "Thing 2");
                 mSeekBar.setMax(mMediaPlayer.getDuration());
                 mSeekBar.setProgress(0);
 
                 //Set the start and end time
                 long endTimeSecs = TimeUnit.MILLISECONDS.toSeconds(mMediaPlayer.getDuration());
-                String endTimeStr = String.format("%d:%02d", endTimeSecs/60, endTimeSecs%60);
+                String endTimeStr = String.format("%d:%02d", endTimeSecs / 60, endTimeSecs % 60);
                 mSeekEndTimeText.setText(endTimeStr);
             }
         });
@@ -338,15 +338,17 @@ public class PlayerFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
 
-        mMediaPlayer.stop();
-        mMediaPlayerState = MediaPlayerState.STOPPED;
-        mMediaPlayer.release();
+        if(mMediaPlayerState == MediaPlayerState.STARTED || mMediaPlayerState == MediaPlayerState.PAUSED) {
+            mMediaPlayer.stop();
+            mMediaPlayerState = MediaPlayerState.STOPPED;
+            mMediaPlayer.release();
+        }
     }
 
     public void onStop() {
         super.onStop();
 
-        if(mMediaPlayerState == MediaPlayerState.STARTED) {
+        if(mMediaPlayerState == MediaPlayerState.STARTED || mMediaPlayerState == MediaPlayerState.PAUSED) {
             mMediaPlayer.stop();
             mMediaPlayerState = MediaPlayerState.STOPPED;
             mMediaPlayer.release();
