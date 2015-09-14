@@ -44,6 +44,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.spotstream.SongsActivity" />
         </activity>
+
+        <service android:name="com.example.android.spotstream.PlayerService" />
     </application>
 
 </manifest>

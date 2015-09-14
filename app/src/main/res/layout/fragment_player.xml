@@ -52,7 +52,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/player_seek_start"
+                android:id="@+id/player_seek_curr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"

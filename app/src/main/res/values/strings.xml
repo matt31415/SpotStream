@@ -10,5 +10,6 @@
     <string name="title_activity_player">Player</string>
     <string name="player_songs_key">PLAYER_SONGS</string>
     <string name="player_song_position_key">PLAYER_SONG_POSITION</string>
+    <string name="player_fragment_curr_pos_key">CurrentSongPosition</string>
 
 </resources>
